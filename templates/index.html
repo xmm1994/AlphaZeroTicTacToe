@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>井字棋人机对战（AlphaZero）</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+
+        td {
+            width: 100px;
+            height: 100px;
+            border: 1px solid black;
+            text-align: center;
+            font-size: 60px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <table id="board">
+        <tr>
+            <td id="0"></td>
+            <td id="1"></td>
+            <td id="2"></td>
+        </tr>
+        <tr>
+            <td id="3"></td>
+            <td id="4"></td>
+            <td id="5"></td>
+        </tr>
+        <tr>
+            <td id="6"></td>
+            <td id="7"></td>
+            <td id="8"></td>
+        </tr>
+    </table>
+    <div id="message"></div>
+
+    <script>
+        // 初始化棋盘状态，用空字符串表示每个格子还未落子
+        const board = ['', '', '', '', '', '', '', '', ''];
+        // 玩家的棋子标记为 'X'
+        const player = 'X';
+        // 计算机的棋子标记为 'O'
+        const computer = 'O';
+        // 当前玩家，初始为玩家
+        let currentPlayer = player;
+
+        // 获取 HTML 中的棋盘表格元素
+        const table = document.getElementById('board');
+        // 获取用于显示游戏结果信息的元素
+        const message = document.getElementById('message');
+
+        // 为棋盘表格添加点击事件监听器
+        table.addEventListener('click', function (event) {
+            // 只有当点击的是表格单元格（td 元素），且该单元格为空，并且当前玩家是人类玩家时才处理点击事件
+            if (event.target.tagName === 'TD' && event.target.textContent === '' && currentPlayer === player) {
+                // 获取点击的单元格的编号（id 属性值转换为整数）
+                const index = parseInt(event.target.id);
+                // 在棋盘状态数组中记录玩家的落子
+                board[index] = player;
+                // 在页面上显示玩家的棋子
+                event.target.textContent = player;
+                // 检查当前游戏状态是否有玩家获胜或平局
+                checkWinner();
+                // 如果当前玩家是计算机，则调用计算机落子的函数
+                if (currentPlayer === computer) {
+                    makeComputerMove();
+                }
+            }
+        });
+
+        function makeComputerMove() {
+            // 向后端的 /move 接口发送 POST 请求，传递当前棋盘的状态
+            fetch('/move', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ board: board })
+            })
+              .then(response => response.json()) // 将响应转换为 JSON 格式
+              .then(data => {
+                    // 获取后端返回的计算机落子的位置
+                    const index = data.move;
+                    // 在棋盘状态数组中记录计算机的落子
+                    board[index] = computer;
+                    // 获取对应的表格单元格元素
+                    const cell = document.getElementById(index);
+                    // 在页面上显示计算机的棋子
+                    cell.textContent = computer;
+                    // 检查当前游戏状态是否有玩家获胜或平局
+                    checkWinner();
+                });
+        }
+
+        function checkWinner() {
+            // 定义所有可能的获胜组合（行、列、对角线）
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+
+            // 遍历所有的获胜组合
+            for (const combination of winningCombinations) {
+                const [a, b, c] = combination;
+                // 如果某一组合的三个格子都有棋子且棋子相同，则该玩家获胜
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    message.textContent = `${board[a]} 获胜！`;
+                    // 禁用棋盘，防止继续点击
+                    disableBoard();
+                    return;
+                }
+            }
+
+            // 如果棋盘上所有格子都已落子且没有获胜的情况，则为平局
+            if (!board.includes('')) {
+                message.textContent = '平局！';
+                // 禁用棋盘，防止继续点击
+                disableBoard();
+            } else {
+                // 切换当前玩家
+                currentPlayer = currentPlayer === player ? computer : player;
+            }
+        }
+
+        function disableBoard() {
+            // 获取棋盘上所有的单元格元素
+            const cells = table.querySelectorAll('td');
+            // 遍历所有单元格，设置鼠标样式为默认，移除点击事件监听器
+            cells.forEach(cell => {
+                cell.style.cursor = 'default';
+                cell.removeEventListener('click', handleCellClick);
+            });
+        }
+    </script>
+</body>
+
+</html>
