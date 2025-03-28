@@ -1,6 +1,6 @@
 # AlphaZeroTicTacToe
 该项目使用了AlphaZero算法实现井字棋web人机对战游戏
-![400](https://github.com/xmm1994/AlphaZeroTicTacToe/main/borad.png)
+![400](https://github.com/xmm1994/AlphaZeroTicTacToe/blob/main/board.png)
 
 ### 运行环境
 - python = 3.9.6
