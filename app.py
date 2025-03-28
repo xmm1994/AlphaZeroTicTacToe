@@ -15,7 +15,7 @@ if args.player_name == 'AlphaZero':
     model = keras.models.load_model('./model/alphazero_tictactoe_model.keras')
     player = AlphaZeroPlayer(model = model, simulations = 100)
 elif args.player_name == 'MCTS':
-     player = MCTSPlayer(simulations = 100)
+    player = MCTSPlayer(simulations = 100)
 else:
     print("player name error, please input AlphaZero or MCTS")
 

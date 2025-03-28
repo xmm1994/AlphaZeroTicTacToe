@@ -1,6 +1,7 @@
 import random
 import copy
 import math
+from tools import *
 
 class MCTSNode:
     def __init__(self, state, parent=None):

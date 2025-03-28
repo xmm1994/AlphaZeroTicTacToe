@@ -241,7 +241,7 @@ if __name__ == "__main__":
     # 定义价值损失函数，使用均方误差损失函数
     value_loss_fn = keras.losses.MeanSquaredError()
 
-    alphazero_player = AlphaZeroPlayer(model, optimizer, policy_loss_fn, value_loss_fn, 100, 100)
+    alphazero_player = AlphaZeroPlayer(model, optimizer, policy_loss_fn, value_loss_fn, 1000, 100)
 
     alphazero_player.train_model()
     # 保存训练好的模型，添加 .keras 扩展名
