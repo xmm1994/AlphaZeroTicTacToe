@@ -1,5 +1,6 @@
 # AlphaZeroTicTacToe
 该项目使用了AlphaZero算法实现井字棋web人机对战游戏
+
 <img src="board.png" alt="board" width="200">
 
 ### 运行环境
